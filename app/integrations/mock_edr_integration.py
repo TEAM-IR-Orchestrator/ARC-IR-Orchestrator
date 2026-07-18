@@ -18,3 +18,5 @@ class MockEDRIntegration:
         """
         print("Sending alert to webhook...")
         print(alert)
+
+        return alert
