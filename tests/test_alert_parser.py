@@ -25,49 +25,25 @@ def sample_raw_alert():
         title="Manual Test Alert",
         description="Test alert generated for parser unit tests",
     )
-
-
-def test_manual_alert_is_parsed_successfully(parser, sample_raw_alert):
-    parsed = parser.parse(
+@pytest.fixture
+def parsed_alert(parser, sample_raw_alert):
+    return parser.parse(
         alert_data=sample_raw_alert.model_dump(),
         provider=sample_raw_alert.provider,
     )
 
-    assert parsed is not None
-    assert parsed.provider == "MANUAL"
+def test_manual_alert_is_parsed_successfully(parsed_alert):
+    assert parsed_alert is not None
+    assert parsed_alert.provider == "MANUAL"
 
+def test_critical_severity_remains_critical(parsed_alert):
+    assert parsed_alert.severity == "critical"
 
-def test_critical_severity_remains_critical(parser, sample_raw_alert):
-    parsed = parser.parse(
-        alert_data=sample_raw_alert.model_dump(),
-        provider=sample_raw_alert.provider,
-    )
+def test_hostname_is_parsed_correctly(parsed_alert, sample_raw_alert):
+    assert parsed_alert.hostname == sample_raw_alert.hostname
 
-    assert parsed.severity == "critical"
+def test_username_is_parsed_correctly(parsed_alert, sample_raw_alert):
+    assert parsed_alert.username == sample_raw_alert.username
 
-
-def test_hostname_is_parsed_correctly(parser, sample_raw_alert):
-    parsed = parser.parse(
-        alert_data=sample_raw_alert.model_dump(),
-        provider=sample_raw_alert.provider,
-    )
-
-    assert parsed.hostname == sample_raw_alert.hostname
-
-
-def test_username_is_parsed_correctly(parser, sample_raw_alert):
-    parsed = parser.parse(
-        alert_data=sample_raw_alert.model_dump(),
-        provider=sample_raw_alert.provider,
-    )
-
-    assert parsed.username == sample_raw_alert.username
-
-
-def test_process_hash_is_parsed_correctly(parser, sample_raw_alert):
-    parsed = parser.parse(
-        alert_data=sample_raw_alert.model_dump(),
-        provider=sample_raw_alert.provider,
-    )
-
-    assert parsed.process_hash == sample_raw_alert.process_hash
+def test_process_hash_is_parsed_correctly(parsed_alert, sample_raw_alert):
+    assert parsed_alert.process_hash == sample_raw_alert.process_hash
