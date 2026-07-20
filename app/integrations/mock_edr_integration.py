@@ -1,3 +1,5 @@
+import httpx
+
 class MockEDRIntegration:
     """
     Integration layer for sending alerts from the Mock EDR service.
@@ -11,12 +13,20 @@ class MockEDRIntegration:
 
     def send_alert(self, alert):
         """
-        Simulate sending an alert to a webhook.
-
-        Args:
-            alert: RawAlert object
+        Send the alert to the webhook endpoint.
         """
-        print("Sending alert to webhook...")
-        print(alert)
 
-        return alert
+        webhook_url = "http://127.0.0.1:8000/api/v1/webhooks/edr"
+
+        response = httpx.post(
+            webhook_url,
+            headers={
+                "X-API-Key": "mock-edr-secret"
+            },
+            json=alert.model_dump(mode="json")
+    )
+
+        print(f"Status Code : {response.status_code}")
+        print(response.json())
+
+        return response
