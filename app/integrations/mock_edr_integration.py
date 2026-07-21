@@ -1,5 +1,9 @@
 import httpx
 
+WEBHOOK_URL = "http://127.0.0.1:8000/api/v1/webhooks/edr"
+API_KEY = "mock-edr-secret"
+
+
 class MockEDRIntegration:
     """
     Integration layer for sending alerts from the Mock EDR service.
@@ -16,15 +20,13 @@ class MockEDRIntegration:
         Send the alert to the webhook endpoint.
         """
 
-        webhook_url = "http://127.0.0.1:8000/api/v1/webhooks/edr"
-
         response = httpx.post(
-            webhook_url,
+            WEBHOOK_URL,
             headers={
-                "X-API-Key": "mock-edr-secret"
+                "X-API-Key": API_KEY
             },
             json=alert.model_dump(mode="json")
-    )
+        )
 
         print(f"Status Code : {response.status_code}")
         print(response.json())
