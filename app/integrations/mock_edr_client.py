@@ -1,3 +1,6 @@
+import random
+
+
 class MockEDRClient:
     """
     Client responsible for communicating with the Mock EDR.
@@ -15,9 +18,35 @@ class MockEDRClient:
 
         print(f"[MockEDR] Sending network containment command for host: {hostname}")
 
+        responses = [
+            {
+                "status": "success",
+                "action": "network_containment",
+                "message": "Host successfully isolated."
+            },
+            {
+                "status": "success",
+                "action": "network_containment",
+                "message": "Host is already isolated."
+            },
+            {
+                "status": "failed",
+                "action": "network_containment",
+                "message": "Host not found."
+            },
+            {
+                "status": "failed",
+                "action": "network_containment",
+                "message": "Unable to communicate with endpoint."
+            }
+        ]
+
+        response = random.choice(responses)
+
         return {
-            "status": "success",
-            "action": "network_containment",
+            "status": response["status"],
+            "action": response["action"],
             "hostname": hostname,
-            "message": f"Host '{hostname}' successfully isolated."
+            "message": response["message"]
         }
+    
