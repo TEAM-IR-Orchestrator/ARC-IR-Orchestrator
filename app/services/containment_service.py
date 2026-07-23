@@ -21,8 +21,26 @@ class ContainmentService:
 
         print(f"[ContainmentService] Initiating containment for host: {hostname}")
 
+        # Delegate external communication to the Mock EDR Client
         result = self.edr_client.isolate_host(hostname)
 
-        print("[ContainmentService] Network containment completed.")
+        status = str(result.get("status", "")).lower()
+        message = str(result.get("message", "")).lower()
 
+        if status == "success":
+            if "already" in message and "isolated" in message:
+                print("[ContainmentService] Host is already isolated.")
+            else:
+                print("[ContainmentService] Network containment completed successfully.")
+
+        elif status == "failed":
+            if "not found" in message:
+                print("[ContainmentService] Host not found.")
+            else:
+                print("[ContainmentService] Network containment failed.")
+
+        else:
+            print("[ContainmentService] Unknown containment response received.")
+
+        # Return the original response without modification
         return result
