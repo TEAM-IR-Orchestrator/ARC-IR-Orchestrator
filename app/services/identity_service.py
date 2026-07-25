@@ -18,11 +18,13 @@ class IdentityService:
         """
         Suspend a compromised user account.
         """
-        pass
+        response = self.identity_provider.disable_user(username)
+        return response
 
     def revoke_user_sessions(self, username: str):
         """
         Revoke all active sessions for
         a compromised user.
         """
-        pass
+        response = self.identity_provider.revoke_sessions(username)
+        return response
