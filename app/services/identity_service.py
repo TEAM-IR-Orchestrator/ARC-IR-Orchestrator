@@ -14,10 +14,8 @@ class IdentityService:
     def __init__(self):
         self.identity_provider = MockIdentityProvider()
 
+    # Disable the specified user account.
     def suspend_user(self, username: str):
-        """
-        Suspend a compromised user account.
-        """
         response = self.identity_provider.disable_user(username)
         return response
 
