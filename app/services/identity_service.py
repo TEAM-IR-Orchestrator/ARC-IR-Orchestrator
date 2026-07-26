@@ -12,7 +12,8 @@ class IdentityService:
     """
 
     def __init__(self):
-        self.identity_provider = MockIdentityProvider()
+     """Initialize the identity provider client."""
+     self.identity_provider = MockIdentityProvider()
 
     # Disable the specified user account.
     def suspend_user(self, username: str):
