@@ -44,6 +44,7 @@ class MockEDRClient:
             }
         ]
 
+        # Randomly simulate an EDR containment response.
         response = random.choice(responses)
 
         return {
@@ -52,3 +53,4 @@ class MockEDRClient:
             "hostname": hostname,
             "message": response["message"]
         }
+    

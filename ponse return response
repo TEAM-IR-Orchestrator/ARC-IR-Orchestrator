@@ -1,0 +1,22 @@
+[1mdiff --git a/app/services/identity_service.py b/app/services/identity_service.py[m
+[1mindex 383d6b3..4f92564 100644[m
+[1m--- a/app/services/identity_service.py[m
+[1m+++ b/app/services/identity_service.py[m
+[36m@@ -18,11 +18,13 @@[m [mclass IdentityService:[m
+         """[m
+         Suspend a compromised user account.[m
+         """[m
+[31m-        pass[m
+[32m+[m[32m        response = self.identity_provider.disable_user(username)[m
+[32m+[m[32m        return response[m
+ [m
+     def revoke_user_sessions(self, username: str):[m
+         """[m
+         Revoke all active sessions for[m
+         a compromised user.[m
+         """[m
+[31m-        pass[m
+\ No newline at end of file[m
+[32m+[m[32m        response = self.identity_provider.revoke_sessions(username)[m
+[32m+[m[32m        return response[m
+\ No newline at end of file[m
