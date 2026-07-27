@@ -16,3 +16,6 @@ __pycache__/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Ignore the entire virtual environment
+/.venv

@@ -13,11 +13,14 @@ class MockEDRClient:
     def isolate_host(self, hostname: str):
         """
         Simulate sending a network containment command
-        to isolate a compromised host.
+        and return one of several realistic containment
+        responses from a mock Enterprise EDR.
         """
 
         print(f"[MockEDR] Sending network containment command for host: {hostname}")
 
+        # Predefined mock containment responses used to simulate
+        # different Enterprise EDR network isolation outcomes.
         responses = [
             {
                 "status": "success",
@@ -41,6 +44,7 @@ class MockEDRClient:
             }
         ]
 
+        # Randomly simulate an EDR containment response.
         response = random.choice(responses)
 
         return {
@@ -49,3 +53,4 @@ class MockEDRClient:
             "hostname": hostname,
             "message": response["message"]
         }
+    
