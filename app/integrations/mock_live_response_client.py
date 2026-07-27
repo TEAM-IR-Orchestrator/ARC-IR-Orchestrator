@@ -1,3 +1,6 @@
+import random
+
+
 class MockLiveResponseClient:
     """
     Simulates an Enterprise EDR Live Response client.
@@ -16,11 +19,76 @@ class MockLiveResponseClient:
         Simulate remotely executing KAPE
         on the compromised endpoint.
         """
-        pass
+
+        # Predefined mock responses for KAPE collection.
+        responses = [
+            {
+                "status": "success",
+                "action": "execute_kape",
+                "message": "KAPE collection completed successfully."
+            },
+            {
+                "status": "success",
+                "action": "execute_kape",
+                "message": "KAPE collection already running."
+            },
+            {
+                "status": "failed",
+                "action": "execute_kape",
+                "message": "Endpoint not reachable."
+            },
+            {
+                "status": "failed",
+                "action": "execute_kape",
+                "message": "Failed to start KAPE collection."
+            }
+        ]
+
+        response = random.choice(responses)
+
+        return {
+            "status": response["status"],
+            "action": response["action"],
+            "hostname": hostname,
+            "message": response["message"]
+        }
 
     def capture_memory(self, hostname: str):
         """
         Simulate remotely capturing
         a memory dump from the endpoint.
         """
-        pass
+
+        # Predefined mock responses for memory acquisition.
+        responses = [
+            {
+                "status": "success",
+                "action": "capture_memory",
+                "message": "Memory acquisition completed successfully."
+            },
+            {
+                "status": "success",
+                "action": "capture_memory",
+                "message": "Memory acquisition already in progress."
+            },
+            {
+                "status": "failed",
+                "action": "capture_memory",
+                "message": "Endpoint not reachable."
+            },
+            {
+                "status": "failed",
+                "action": "capture_memory",
+                "message": "Failed to capture memory."
+            }
+        ]
+
+        response = random.choice(responses)
+
+        return {
+            "status": response["status"],
+            "action": response["action"],
+            "hostname": hostname,
+            "message": response["message"]
+        }
+    
