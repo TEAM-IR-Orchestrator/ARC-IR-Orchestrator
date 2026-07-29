@@ -1,4 +1,4 @@
-from app.integrations.mock_live_response_client import MockLiveResponseClient
+from app.clients.evidence.evidence_client import MockLiveResponseClient
 
 
 class EvidenceCollectionService:

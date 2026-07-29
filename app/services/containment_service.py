@@ -1,4 +1,4 @@
-from app.integrations.mock_edr_client import MockEDRClient
+from app.clients.edr.edr_client import MockEDRClient
 
 
 class ContainmentService:

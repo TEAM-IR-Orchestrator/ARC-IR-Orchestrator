@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 
-from app.integrations.mock_edr_client import MockEDRClient
+from app.clients.edr.edr_client import MockEDRClient
 
 
 @pytest.fixture
