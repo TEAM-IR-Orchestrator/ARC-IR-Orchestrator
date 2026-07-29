@@ -1,4 +1,4 @@
-from app.integrations.mock_identity_provider import MockIdentityProvider
+from app.clients.identity.identity_client import MockIdentityProvider
 
 
 class IdentityService:
