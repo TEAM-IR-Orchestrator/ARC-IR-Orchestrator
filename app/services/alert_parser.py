@@ -3,57 +3,71 @@ from app.schemas.parsed_alert import ParsedAlert
 
 class AlertParser:
     """
-    Converts vendor-specific webhook payloads
-    into a standardized ParsedAlert object.
+    Converts Wazuh webhook payloads into a standardized ParsedAlert object.
     """
 
     def parse(self, alert_data: dict, provider: str) -> ParsedAlert:
         provider = provider.upper()
 
-        if provider == "MANUAL":
-            return self._parse_manual(alert_data)
-
-        elif provider == "CROWDSTRIKE":
-            return self._parse_crowdstrike(alert_data)
+        if provider == "WAZUH":
+            return self._parse_wazuh(alert_data)
 
         raise ValueError(f"Unsupported provider: {provider}")
-    
-    def _parse_manual(self, alert_data: dict) -> ParsedAlert:
+
+    def _convert_wazuh_severity(self, level: int) -> str:
+        """
+        Convert Wazuh rule levels into internal severity levels.
+        """
+
+        if level <= 2:
+            return "Low"
+        elif level <= 7:
+            return "Medium"
+        elif level <= 11:
+            return "High"
+        else:
+            return "Critical"
+
+    def _parse_wazuh(self, alert_data: dict) -> ParsedAlert:
+
+        rule = alert_data.get("rule", {})
+        agent = alert_data.get("agent", {})
+        data = alert_data.get("data", {})
+        mitre = rule.get("mitre", {})
+
         return ParsedAlert(
-            alert_id=alert_data["alert_id"],
-            provider="MANUAL",
-            severity=alert_data["severity"],
-            timestamp=alert_data["timestamp"],
 
-            hostname=alert_data["hostname"],
-            ip_address=alert_data["ip_address"],
-            device_id=alert_data.get("device_id"),
+            # Alert Information
+            alert_id=alert_data.get("id", ""),
+            provider="WAZUH",
+            severity=self._convert_wazuh_severity(rule.get("level", 0)),
+            timestamp=alert_data.get("@timestamp"),
 
-            username=alert_data["username"],
+            # Device Information
+            hostname=agent.get("name", ""),
+            ip_address=agent.get("ip", ""),
+            device_id=agent.get("id"),
 
-            process_name=alert_data["process_name"],
-            process_hash=alert_data["process_hash"],
+            # User Information
+            username=data.get("srcuser")
+            or data.get("dstuser")
+            or "",
 
-            title=alert_data.get("title"),
-            description=alert_data.get("description"),
-            )
-# TODO:
-# Replace CrowdStrike parser with Wazuh parser.
-    def _parse_crowdstrike(self, alert_data: dict) -> ParsedAlert:
-        return ParsedAlert(
-            alert_id=alert_data["alert_id"],
-            provider="CROWDSTRIKE",
-            severity=alert_data["severity"],
-            timestamp=alert_data["timestamp"],
+            # Process Information
+            process_name=data.get("process_name"),
+            process_hash=data.get("process_hash"),
 
-            hostname=alert_data["hostname"],
-            ip_address=alert_data["ip_address"],
-            device_id=alert_data.get("device_id"),
+            # Alert Details
+            title=rule.get("description"),
+            description=alert_data.get("full_log"),
 
-            username=alert_data["username"],
+            # Wazuh Information
+            rule_id=rule.get("id"),
+            groups=rule.get("groups", []),
+            mitre_id=mitre.get("id", []),
+            mitre_technique=mitre.get("technique", []),
+            mitre_tactic=mitre.get("tactic", []),
 
-            process_name=alert_data["process_name"],
-            process_hash=alert_data["process_hash"],
-            title=alert_data.get("title"),
-            description=alert_data.get("description"),
+            # Raw Event Data
+            event_data=data,
         )
