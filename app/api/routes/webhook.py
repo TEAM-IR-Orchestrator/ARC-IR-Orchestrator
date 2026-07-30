@@ -1,6 +1,6 @@
 from fastapi import APIRouter,Header, HTTPException
+from typing import Any
 
-from app.schemas.raw_alert import RawAlert
 from app.services.alert_parser import AlertParser
 from app.orchestrator.incident_orchestrator import IncidentOrchestrator
 
@@ -26,15 +26,15 @@ def verify_webhook_request(api_key: str | None):
 
 @router.post("/wazuh")
 async def receive_wazuh_alert(
-    alert: RawAlert,
+    alert: dict[str, Any],
     x_api_key: str | None = Header(default=None),
 ):
     verify_webhook_request(x_api_key)
     parser = AlertParser()
 
     parsed_alert = parser.parse(
-        alert_data=alert.model_dump(),
-        provider=alert.provider,
+        alert_data=alert,
+        provider="WAZUH",
     )
 
     orchestrator = IncidentOrchestrator()
