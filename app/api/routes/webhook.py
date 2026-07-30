@@ -24,8 +24,8 @@ def verify_webhook_request(api_key: str | None):
             detail="Unauthorized webhook request",
         )
 
-@router.post("/edr")
-async def receive_edr_alert(
+@router.post("/wazuh")
+async def receive_wazuh_alert(
     alert: RawAlert,
     x_api_key: str | None = Header(default=None),
 ):

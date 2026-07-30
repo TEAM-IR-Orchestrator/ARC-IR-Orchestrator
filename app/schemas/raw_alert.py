@@ -1,24 +1,15 @@
-from datetime import datetime
-from typing import Optional
+from typing import Any
 
 from pydantic import BaseModel
 
 
 class RawAlert(BaseModel):
-    provider: str = "MANUAL"
+    """
+    Raw alert received from a security provider.
 
-    alert_id: str
-    severity: str
-    timestamp: datetime
+    The payload is intentionally kept provider-specific.
+    Parsing and normalization are handled by AlertParser.
+    """
 
-    hostname: str
-    ip_address: str
-    device_id: Optional[str] = None
-
-    username: str
-
-    process_name: str
-    process_hash: str
-
-    title: Optional[str] = None
-    description: Optional[str] = None
+    provider: str = "WAZUH"
+    payload: dict[str, Any]
