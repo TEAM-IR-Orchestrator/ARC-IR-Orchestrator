@@ -37,7 +37,8 @@ class AlertParser:
             title=alert_data.get("title"),
             description=alert_data.get("description"),
             )
-    
+# TODO:
+# Replace CrowdStrike parser with Wazuh parser.
     def _parse_crowdstrike(self, alert_data: dict) -> ParsedAlert:
         return ParsedAlert(
             alert_id=alert_data["alert_id"],

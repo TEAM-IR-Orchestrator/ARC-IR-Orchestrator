@@ -10,15 +10,15 @@ router = APIRouter(
     tags=["EDR Webhooks"]
 )
 
-def verify_mock_edr_request(api_key: str | None):
+def verify_webhook_request(api_key: str | None):
     """
     Verify that the incoming webhook request
     is coming from the trusted Mock EDR.
     """
 
-    EXPECTED_API_KEY = "mock-edr-secret"
+    WEBHOOK_SECRET = "mock-edr-secret"
 
-    if api_key != EXPECTED_API_KEY:
+    if api_key != WEBHOOK_SECRET:
         raise HTTPException(
             status_code=401,
             detail="Unauthorized webhook request",
@@ -29,7 +29,7 @@ async def receive_edr_alert(
     alert: RawAlert,
     x_api_key: str | None = Header(default=None),
 ):
-    verify_mock_edr_request(x_api_key)
+    verify_webhook_request(x_api_key)
     parser = AlertParser()
 
     parsed_alert = parser.parse(
