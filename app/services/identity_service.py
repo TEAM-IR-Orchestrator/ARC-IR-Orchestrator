@@ -1,4 +1,7 @@
 from app.clients.identity.identity_client import MockIdentityProvider
+from app.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class IdentityService:
@@ -6,24 +9,38 @@ class IdentityService:
     Service responsible for identity containment actions.
 
     Business logic related to user suspension and
-    session revocation should live here, while
-    communication with the Identity Provider is
-    delegated to MockIdentityProvider.
+    session revocation lives here, while communication
+    with the identity provider is delegated to the client.
     """
 
     def __init__(self):
-     """Initialize the identity provider client."""
-     self.identity_provider = MockIdentityProvider()
+        self.identity_provider = MockIdentityProvider()
 
-    # Disable the specified user account.
     def suspend_user(self, username: str):
+        logger.info(
+            "Suspending user '%s'.",
+            username,
+        )
+
         response = self.identity_provider.disable_user(username)
+        logger.info(
+            "User suspension result: %s",
+            response,
+        )
+
         return response
 
     def revoke_user_sessions(self, username: str):
-        """
-        Revoke all active sessions for
-        a compromised user.
-        """
+        logger.info(
+            "Revoking active sessions for user '%s'.",
+            username,
+        )
+
         response = self.identity_provider.revoke_sessions(username)
+
+        logger.info(
+            "Session revocation result: %s",
+            response,
+        )
+
         return response

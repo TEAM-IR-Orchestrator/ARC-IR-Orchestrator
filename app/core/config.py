@@ -2,11 +2,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+
     APP_NAME: str = "Automated Ransomware Containment & Incident Response Orchestrator"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
 
-    # Wazuh API Configuration
+    # Webhook Security
+    WEBHOOK_API_KEY: str
+
+    
+    # Wazuh
     WAZUH_API_URL: str
     WAZUH_USERNAME: str
     WAZUH_PASSWORD: str
@@ -14,7 +19,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        extra="ignore"
+        extra="ignore",
     )
 
 

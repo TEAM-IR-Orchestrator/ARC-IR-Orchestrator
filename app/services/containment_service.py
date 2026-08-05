@@ -1,47 +1,64 @@
-from app.clients.edr.edr_client import MockEDRClient
+from app.clients.edr.wazuh_client import WazuhClient
+from app.core.logger import get_logger
+from app.schemas.parsed_alert import ParsedAlert
+
+logger = get_logger(__name__)
 
 
 class ContainmentService:
     """
-    Service responsible for executing containment actions
-    against compromised endpoints.
-
-    Business logic related to containment should live here,
-    while communication with the EDR is delegated to the
-    MockEDRClient.
+    Executes endpoint containment by delegating
+    to the configured EDR client.
     """
 
     def __init__(self):
-        self.edr_client = MockEDRClient()
+        self.edr_client = WazuhClient()
 
-    def contain_host(self, hostname: str):
-        """
-        Execute network containment for the specified host.
-        """
+    def contain_host(self, agent_id: str, hostname: str, alert: ParsedAlert,):
+        if not agent_id:
+            raise ValueError(
+            f"No Wazuh agent ID available for host '{hostname}'."
+        )
 
-        print(f"[ContainmentService] Initiating containment for host: {hostname}")
+        logger.info(
+            "Starting containment for host '%s'.",
+            hostname,
+        )
 
-        # Delegate external communication to the Mock EDR Client
-        result = self.edr_client.isolate_host(hostname)
+        result = self.edr_client.isolate_host(agent_id = agent_id, alert=alert)
 
         status = str(result.get("status", "")).lower()
         message = str(result.get("message", "")).lower()
 
         if status == "success":
-            if "already" in message and "isolated" in message:
-                print("[ContainmentService] Host is already isolated.")
+
+            if "already" in message:
+
+                logger.info(
+                    "Host '%s' is already isolated.",
+                    hostname,
+                )
+
             else:
-                print("[ContainmentService] Network containment completed successfully.")
+
+                logger.info(
+                    "Host '%s' isolated successfully.",
+                    hostname,
+                )
 
         elif status == "failed":
-            if "not found" in message:
-                print("[ContainmentService] Host not found.")
-            else:
-                print("[ContainmentService] Network containment failed.")
+
+            logger.error(
+                "Containment failed for host '%s': %s",
+                hostname,
+                result.get("message"),
+            )
 
         else:
-            print("[ContainmentService] Unknown containment response received.")
 
-        # Return the original response without modification
+            logger.warning(
+                "Unexpected containment response: %s",
+                result,
+            )
+
         return result
-    

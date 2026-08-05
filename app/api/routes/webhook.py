@@ -3,7 +3,8 @@ from typing import Any
 
 from app.services.alert_parser import AlertParser
 from app.orchestrator.incident_orchestrator import IncidentOrchestrator
-
+from app.services.threat_evaluator import ThreatEvaluator
+from app.core.config import settings
 
 router = APIRouter(
     prefix="/api/v1/webhooks",
@@ -16,9 +17,8 @@ def verify_webhook_request(api_key: str | None):
     is coming from the trusted Mock EDR.
     """
 
-    WEBHOOK_SECRET = "mock-edr-secret"
+    if api_key != settings.WEBHOOK_API_KEY:
 
-    if api_key != WEBHOOK_SECRET:
         raise HTTPException(
             status_code=401,
             detail="Unauthorized webhook request",
@@ -37,13 +37,24 @@ async def receive_wazuh_alert(
         provider="WAZUH",
     )
 
+    evaluator = ThreatEvaluator()
+    decision = evaluator.evaluate(parsed_alert)
     orchestrator = IncidentOrchestrator()
-    orchestrator.process_incident(parsed_alert)
+
+    if decision:
+        orchestrator.process(
+            decision = decision,
+            alert = parsed_alert,
+        )
 
     return {
         "status": "success",
-        "message": "Alert parsed successfully",
         "parsed_alert": parsed_alert.model_dump(),
+        "decision": (
+            decision.model_dump()
+            if decision
+            else None
+        ),
     }
 
     

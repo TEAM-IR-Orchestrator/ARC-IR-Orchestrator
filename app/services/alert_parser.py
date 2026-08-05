@@ -34,6 +34,7 @@ class AlertParser:
         agent = alert_data.get("agent", {})
         data = alert_data.get("data", {})
         mitre = rule.get("mitre", {})
+        
 
         return ParsedAlert(
 
@@ -41,12 +42,15 @@ class AlertParser:
             alert_id=alert_data.get("id", ""),
             provider="WAZUH",
             severity=self._convert_wazuh_severity(rule.get("level", 0)),
+            rule_level=rule.get("level", 0),
+            rule_id=rule.get("id", ""),
             timestamp=alert_data.get("@timestamp"),
 
             # Device Information
             hostname=agent.get("name", ""),
             ip_address=agent.get("ip", ""),
             device_id=agent.get("id"),
+            source_ip=alert_data.get("data", {}).get("srcip"),
 
             # User Information
             username=data.get("srcuser")
@@ -62,7 +66,6 @@ class AlertParser:
             description=alert_data.get("full_log"),
 
             # Wazuh Information
-            rule_id=rule.get("id"),
             groups=rule.get("groups", []),
             mitre_id=mitre.get("id", []),
             mitre_technique=mitre.get("technique", []),

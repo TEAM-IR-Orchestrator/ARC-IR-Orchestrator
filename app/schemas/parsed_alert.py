@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ParsedAlert(BaseModel):
@@ -10,12 +10,15 @@ class ParsedAlert(BaseModel):
     alert_id: str
     provider: str
     severity: str
+    rule_level: int
+    rule_id: str
     timestamp: datetime
 
     # Device
     hostname: str
     ip_address: str
     device_id: Optional[str] = None
+    source_ip: Optional[str] = None
 
     # User
     username: Optional[str] = None
@@ -29,11 +32,9 @@ class ParsedAlert(BaseModel):
     description: Optional[str] = None
 
     # Wazuh-specific but still generic
-    rule_id: Optional[str] = None
-    groups: list[str] = []
-    mitre_id: list[str] = []
-    mitre_technique: list[str] = []
-    mitre_tactic: list[str] = []
+    groups: list[str] = Field(default_factory=list)
+    mitre_id: list[str] = Field(default_factory=list)
+    mitre_technique: list[str] = Field(default_factory=list)
+    mitre_tactic: list[str] = Field(default_factory=list)
 
-    # Preserve original event-specific fields
-    event_data: dict = {}
+    event_data: dict = Field(default_factory=dict)

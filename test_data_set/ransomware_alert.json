@@ -1,0 +1,46 @@
+{
+  "id": "1785800000.999999",
+  "@timestamp": "2026-08-03T14:00:00.000Z",
+
+  "agent": {
+    "id": "001",
+    "name": "Ubuntu-desktop",
+    "ip": "192.168.29.209"
+  },
+
+  "rule": {
+    "id": "100500",
+    "level": 15,
+    "description": "Possible ransomware activity detected on endpoint.",
+    "groups": [
+      "ransomware",
+      "malware",
+      "filesystem"
+    ],
+    "mitre": {
+      "id": [
+        "T1486"
+      ],
+      "technique": [
+        "Data Encrypted for Impact"
+      ],
+      "tactic": [
+        "Impact"
+      ]
+    }
+  },
+
+  "data": {
+    "srcuser": "ubuntu80",
+    "process_name": "encryptor.exe",
+    "process_hash": "8d4f8d84b9c6172cfb2d9aa8d0df9f32d5d94aaf0b12f3d2b6d5e8d82b7ac9ab",
+    "file_count": 1450,
+    "encrypted_extensions": [
+      ".docx",
+      ".xlsx",
+      ".pdf"
+    ]
+  },
+
+  "full_log": "High-confidence ransomware behaviour detected. Multiple files encrypted within a short time window. Shadow copy deletion observed."
+}

@@ -1,48 +1,62 @@
+from app.models.threat_decision import ThreatDecision
+from app.playbooks.ransomware_playbook import RansomwarePlaybook
 from app.schemas.parsed_alert import ParsedAlert
-from app.services.containment_service import ContainmentService
-from app.services.identity_service import IdentityService
+from app.core.logger import get_logger
 
+logger = get_logger(__name__)
 
 class IncidentOrchestrator:
     """
-    Coordinates the complete incident response workflow.
+    Central orchestration layer.
+
+    Receives a ThreatDecision from the Threat Evaluator
+    and delegates execution to the appropriate playbook.
+
+    The orchestrator never contains response logic.
     """
 
     def __init__(self):
-        self.containment_service = ContainmentService()
-        self.identity_service = IdentityService()
 
-    def process_incident(self, parsed_alert: ParsedAlert):
-        print("Incident Orchestrator received alert.")
-        print(parsed_alert)
+        self._playbooks = {
 
-        if parsed_alert.severity.lower() in ["high", "critical"]:
+            "RANSOMWARE_CONTAINMENT": RansomwarePlaybook(),
 
-            print(
-                f"[IncidentOrchestrator] "
-                f"Severity '{parsed_alert.severity}' requires containment."
+        }
+
+    def process(
+        self,
+        decision: ThreatDecision,
+        alert: ParsedAlert,
+    ):
+
+        if not decision.should_trigger_playbook:
+
+            logger.info(
+                "No playbook triggered."
             )
 
-            containment_result = self.containment_service.contain_host(
-                parsed_alert.hostname
+            return
+
+        playbook = self._playbooks.get(
+            decision.playbook_name
+        )
+
+        if playbook is None:
+
+            raise ValueError(
+                f"Unknown playbook: {decision.playbook_name}"
             )
 
-            print(containment_result)
+        logger.info(
+            "Executing playbook: %s",
+            decision.playbook_name,
+        )
 
-            suspend_result = self.identity_service.suspend_user(
-                parsed_alert.username
-            )
+        playbook.execute(
+            decision=decision,
+            alert = alert,
+        )
 
-            print(suspend_result)
-
-            revoke_result = self.identity_service.revoke_user_sessions(
-                parsed_alert.username
-            )
-
-            print(revoke_result)
-
-        else:
-            print(
-                f"[IncidentOrchestrator] "
-                f"No containment required for '{parsed_alert.severity}' alerts."
-            )
+        logger.info(
+            "Playbook execution completed."
+        )
