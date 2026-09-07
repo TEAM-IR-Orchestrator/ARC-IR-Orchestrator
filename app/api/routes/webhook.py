@@ -5,6 +5,7 @@ from app.services.alert_parser import AlertParser
 from app.orchestrator.incident_orchestrator import IncidentOrchestrator
 from app.services.threat_evaluator import ThreatEvaluator
 from app.core.config import settings
+from app.models.threat_decision import ThreatDecision
 
 router = APIRouter(
     prefix="/api/v1/webhooks",
@@ -40,6 +41,34 @@ async def receive_wazuh_alert(
     evaluator = ThreatEvaluator()
     decision = evaluator.evaluate(parsed_alert)
     orchestrator = IncidentOrchestrator()
+
+    
+    if decision is None:
+
+        decision = ThreatDecision(
+
+            should_trigger_playbook=True,
+
+            playbook_name="RANSOMWARE_CONTAINMENT",
+
+            matched_policy="DEBUG",
+
+            score=100,
+
+            severity="Critical",
+
+            confidence="High",
+
+            priority=100,
+
+            hostname=parsed_alert.hostname,
+
+            device_id=parsed_alert.device_id,
+
+            username=parsed_alert.username,
+
+            source_ip=parsed_alert.source_ip,
+        )
 
     if decision:
         orchestrator.process(
